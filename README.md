@@ -1,6 +1,6 @@
 # R1 Create SDK
 
-Official JavaScript/TypeScript SDK for building R1/RabbitOS plugins with full hardware access, AI integration, and mobile optimization.
+Unofficial community JavaScript/TypeScript SDK for building R1/RabbitOS plugins with full hardware access, AI integration, and mobile optimization.
 
 ## Features
 

@@ -1,6 +1,6 @@
 /**
  * R1 Create SDK
- * Official SDK for building R1/RabbitOS plugins
+ * Unofficial community SDK for building R1/RabbitOS plugins
  * 
  * Features:
  * - Hardware access (accelerometer, touch, PTT, scroll)
