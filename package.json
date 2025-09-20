@@ -1,0 +1,47 @@
+{
+  "name": "r1-create",
+  "version": "1.0.0",
+  "description": "Official SDK for building R1/RabbitOS plugins with hardware access, storage, LLM integration, and optimized UI utilities",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "dev": "tsc --watch",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "r1",
+    "rabbit",
+    "rabbitos",
+    "plugin",
+    "sdk",
+    "hardware",
+    "accelerometer",
+    "llm",
+    "mobile"
+  ],
+  "author": "",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AidanTheBandit/R1-create.js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/AidanTheBandit/R1-create.js/issues"
+  },
+  "homepage": "https://github.com/AidanTheBandit/R1-create.js#readme"
+}
