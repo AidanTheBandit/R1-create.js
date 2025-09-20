@@ -70,7 +70,9 @@
     </div>
 
     <script type="module">
-        import { r1, createR1App } from '../dist/index.js';
+        // Note: In a real R1 environment, you would import from 'r1-create'
+        // For this example, we're importing from the built dist
+        import { r1, createR1App } from './../../dist/index.js';
         
         let accelerometerActive = false;
         

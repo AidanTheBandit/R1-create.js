@@ -117,7 +117,7 @@ export class R1Messaging {
   }
 
   private initializeMessageHandler(): void {
-    if (this.isInitialized) return;
+    if (this.isInitialized || typeof window === 'undefined') return;
 
     // Set up global message handler
     window.onPluginMessage = (data: PluginMessageResponse) => {

@@ -150,6 +150,9 @@ export class HardwareEvents {
   }
 
   private initializeEventListeners(): void {
+    // Only initialize in browser environment
+    if (typeof window === 'undefined') return;
+    
     // Side button (PTT) events
     window.addEventListener('sideClick', () => {
       this.emit('sideClick');
