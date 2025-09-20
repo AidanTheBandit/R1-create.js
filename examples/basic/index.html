@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basic R1 Plugin</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #000;
+            color: #fff;
+            overflow: hidden;
+        }
+        
+        .container {
+            width: 240px;
+            height: 282px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        .status {
+            font-size: 14px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .button {
+            background: #ff6b35;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 8px;
+            transition: background-color 0.2s;
+        }
+        
+        .button:hover {
+            background: #e55a2b;
+        }
+        
+        .accelerometer {
+            font-size: 12px;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="font-size: 18px; margin-bottom: 20px;">R1 Basic Plugin</h1>
+        
+        <div class="status" id="status">Initializing...</div>
+        
+        <button class="button" onclick="askLLM()">Ask LLM</button>
+        <button class="button" onclick="saveData()">Save Data</button>
+        <button class="button" onclick="loadData()">Load Data</button>
+        
+        <div class="accelerometer" id="accelerometer">
+            Accelerometer: Not active
+        </div>
+    </div>
+
+    <script type="module">
+        // Note: In a real R1 environment, you would import from 'r1-create'
+        // For this example, we're importing from the built dist
+        import { r1, createR1App } from './../../dist/index.js';
+        
+        let accelerometerActive = false;
+        
+        createR1App(async (sdk) => {
+            document.getElementById('status').textContent = 'R1 SDK Ready!';
+            
+            // Hardware event listeners
+            sdk.hardware.on('sideClick', () => {
+                document.getElementById('status').textContent = 'Side button clicked!';
+                setTimeout(() => {
+                    document.getElementById('status').textContent = 'R1 SDK Ready!';
+                }, 2000);
+            });
+            
+            sdk.hardware.on('scrollUp', () => {
+                document.getElementById('status').textContent = 'Scrolled up!';
+            });
+            
+            sdk.hardware.on('scrollDown', () => {
+                document.getElementById('status').textContent = 'Scrolled down!';
+            });
+            
+            // Start accelerometer
+            if (await sdk.accelerometer.isAvailable()) {
+                sdk.accelerometer.start((data) => {
+                    document.getElementById('accelerometer').innerHTML = `
+                        Accelerometer:<br>
+                        X: ${data.x.toFixed(2)}<br>
+                        Y: ${data.y.toFixed(2)}<br>
+                        Z: ${data.z.toFixed(2)}
+                    `;
+                });
+                accelerometerActive = true;
+            }
+            
+            // Message handler
+            sdk.messaging.onMessage((response) => {
+                if (response.parsedData) {
+                    console.log('LLM Response:', response.parsedData);
+                    document.getElementById('status').textContent = 'LLM responded!';
+                } else {
+                    console.log('Message:', response.message);
+                    document.getElementById('status').textContent = response.message;
+                }
+            });
+        });
+        
+        // Global functions for buttons
+        window.askLLM = async () => {
+            document.getElementById('status').textContent = 'Asking LLM...';
+            await r1.llm.askLLMJSON('Tell me an interesting fact about technology in JSON format: {"fact": "your fact here"}');
+        };
+        
+        window.saveData = async () => {
+            try {
+                await r1.storage.plain.setItem('demo_data', {
+                    timestamp: new Date().toISOString(),
+                    message: 'Hello from R1 plugin!',
+                    visits: Math.floor(Math.random() * 100)
+                });
+                document.getElementById('status').textContent = 'Data saved!';
+            } catch (error) {
+                document.getElementById('status').textContent = 'Save failed: ' + error.message;
+            }
+        };
+        
+        window.loadData = async () => {
+            try {
+                const data = await r1.storage.plain.getItem('demo_data');
+                if (data) {
+                    document.getElementById('status').textContent = `Loaded: ${data.visits} visits`;
+                    console.log('Loaded data:', data);
+                } else {
+                    document.getElementById('status').textContent = 'No data found';
+                }
+            } catch (error) {
+                document.getElementById('status').textContent = 'Load failed: ' + error.message;
+            }
+        };
+    </script>
+</body>
+</html>
