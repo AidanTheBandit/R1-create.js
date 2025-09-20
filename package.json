@@ -1,7 +1,7 @@
 {
   "name": "r1-create",
   "version": "1.0.0",
-  "description": "Official SDK for building R1/RabbitOS plugins with hardware access, storage, LLM integration, and optimized UI utilities",
+  "description": "3rd party SDK for building R1/RabbitOS plugins with hardware access, storage, LLM integration, and optimized UI utilities",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -40,7 +40,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/AidanTheBandit/R1-create.js.git"
+    "url": "git+https://github.com/AidanTheBandit/R1-create.js.git"
   },
   "bugs": {
     "url": "https://github.com/AidanTheBandit/R1-create.js/issues"
