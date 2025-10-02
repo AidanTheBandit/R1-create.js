@@ -1,6 +1,6 @@
 {
   "name": "r1-create",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Unofficial community SDK for building R1/RabbitOS plugins with hardware access, storage, LLM integration, and optimized UI utilities",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
