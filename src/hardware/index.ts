@@ -188,3 +188,7 @@ export class HardwareEvents {
 export const accelerometer = new AccelerometerAPI();
 export const touch = new TouchAPI();
 export const hardwareEvents = new HardwareEvents();
+
+// Re-export device controls
+export { DeviceControls, deviceControls } from './device-controls';
+export type { DeviceControlsOptions, ScrollWheelData, SideButtonHandler, ScrollWheelHandler } from './device-controls';

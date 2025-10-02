@@ -12,6 +12,9 @@ export interface LLMOptions {
 
 export interface MessageOptions extends LLMOptions {
   useLLM?: boolean;  // Whether to use LLM for response generation
+  useSerpAPI?: boolean;  // Whether to use SERP API for web search
+  pluginId?: string;  // Optional plugin identifier
+  imageBase64?: string;  // Optional base64-encoded image
 }
 
 /**
@@ -56,6 +59,42 @@ export class R1Messaging {
   async askLLM(message: string, options: LLMOptions = {}): Promise<void> {
     await this.sendMessage(message, {
       useLLM: true,
+      ...options
+    });
+  }
+
+  /**
+   * Send a SERP API request for web search
+   * @param query Search query
+   * @param options Additional options
+   */
+  async searchWeb(query: string, options: Omit<MessageOptions, 'useSerpAPI'> = {}): Promise<void> {
+    const payload: PluginMessage = {
+      message: JSON.stringify({
+        query: query,
+        useLocation: false,
+        tag: 'search'
+      }),
+      useSerpAPI: true,
+      ...options
+    };
+
+    if (typeof PluginMessageHandler !== 'undefined') {
+      PluginMessageHandler.postMessage(JSON.stringify(payload));
+    } else {
+      throw new Error('PluginMessageHandler not available. Make sure you are running in R1 environment.');
+    }
+  }
+
+  /**
+   * Send text for text-to-speech output (without LLM processing)
+   * @param text Text to speak
+   * @param options Additional options
+   */
+  async speakText(text: string, options: Omit<MessageOptions, 'useLLM' | 'wantsR1Response'> = {}): Promise<void> {
+    await this.sendMessage(text, {
+      useLLM: false,
+      wantsR1Response: true,
       ...options
     });
   }
@@ -188,6 +227,15 @@ export class LLMHelpers {
    */
   async performTask(task: string, saveToJournal: boolean = true): Promise<void> {
     await this.messaging.askLLMSpeak(task, saveToJournal);
+  }
+
+  /**
+   * Convert text to speech using R1 speaker (no LLM processing)
+   * @param text Text to speak
+   * @param saveToJournal Whether to save to journal
+   */
+  async textToSpeech(text: string, saveToJournal: boolean = false): Promise<void> {
+    await this.messaging.speakText(text, { wantsJournalEntry: saveToJournal });
   }
 
   /**

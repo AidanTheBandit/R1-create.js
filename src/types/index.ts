@@ -36,8 +36,11 @@ export interface CreationStorage {
 export interface PluginMessage {
   message: string;
   useLLM?: boolean;
+  useSerpAPI?: boolean;
   wantsR1Response?: boolean;
   wantsJournalEntry?: boolean;
+  pluginId?: string;
+  imageBase64?: string;
 }
 
 export interface PluginMessageResponse {

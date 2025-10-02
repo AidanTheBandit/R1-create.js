@@ -23,21 +23,28 @@ keyClasses.forEach(className => {
 
 // Test 3: Singleton instances
 console.log('\n✅ Test 3: Singleton instances');
-const instances = ['accelerometer', 'touch', 'storage', 'messaging', 'camera', 'microphone', 'speaker'];
+const instances = ['accelerometer', 'touch', 'storage', 'messaging', 'camera', 'microphone', 'speaker', 'ui', 'deviceControls'];
 instances.forEach(instance => {
   console.log(`   - ${instance}: ${sdk[instance] ? 'Available' : 'Missing'}`);
 });
 
 // Test 4: Utility classes
 console.log('\n✅ Test 4: Utility classes');
-const utilities = ['CSSUtils', 'DOMUtils', 'LayoutUtils', 'Base64Utils', 'MediaUtils'];
+const utilities = ['CSSUtils', 'DOMUtils', 'LayoutUtils', 'Base64Utils', 'MediaUtils', 'R1UI', 'DeviceControls'];
 utilities.forEach(util => {
   console.log(`   - ${util}: ${sdk[util] ? 'Available' : 'Missing'}`);
 });
 
 // Test 5: Types
 console.log('\n✅ Test 5: TypeScript support');
-console.log(`   - Type definitions: ${sdk.HardwareEventType ? 'Available' : 'Missing'}`);
+const types = ['HardwareEventType', 'PluginMessage', 'UIDimensions', 'DeviceControlsOptions'];
+let availableTypes = 0;
+types.forEach(type => {
+  const available = sdk[type] !== undefined;
+  if (available) availableTypes++;
+  console.log(`   - ${type}: ${available ? 'Available' : 'Missing'}`);
+});
+console.log(`   - Type definitions: ${availableTypes}/${types.length} available`);
 
 // Test 6: Package integrity
 console.log('\n✅ Test 6: Package integrity');

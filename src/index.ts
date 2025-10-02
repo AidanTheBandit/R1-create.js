@@ -23,7 +23,14 @@ export {
   HardwareEvents,
   accelerometer,
   touch,
-  hardwareEvents
+  hardwareEvents,
+  // New device controls
+  DeviceControls,
+  deviceControls,
+  type DeviceControlsOptions,
+  type ScrollWheelData,
+  type SideButtonHandler,
+  type ScrollWheelHandler
 } from './hardware';
 
 // Storage APIs
@@ -48,7 +55,19 @@ export {
   LayoutUtils,
   PerformanceUtils,
   R1Component,
-  R1_DIMENSIONS
+  R1_DIMENSIONS,
+  // New UI design system
+  R1UI,
+  ui,
+  type UIDimensions,
+  type UIFontSizes,
+  type UISpacing,
+  type UIButtonSizes,
+  type UIColorPalette,
+  type UIContainerOptions,
+  type UIButtonOptions,
+  type UITextOptions,
+  type UIGridOptions
 } from './ui';
 
 // Media APIs
@@ -67,11 +86,12 @@ import type { HardwareEventType } from './types';
 import { 
   accelerometer, 
   touch, 
-  hardwareEvents 
+  hardwareEvents,
+  deviceControls
 } from './hardware';
 import { storage, R1Storage } from './storage';
 import { messaging, llmHelpers } from './llm';
-import { R1_DIMENSIONS } from './ui';
+import { R1_DIMENSIONS, ui } from './ui';
 import { camera, microphone, speaker, MediaUtils } from './media';
 
 /**
@@ -83,6 +103,7 @@ export class R1SDK {
   public readonly accelerometer = accelerometer;
   public readonly touch = touch;
   public readonly hardware = hardwareEvents;
+  public readonly deviceControls = deviceControls;
   
   // Storage
   public readonly storage = storage;
@@ -95,6 +116,9 @@ export class R1SDK {
   public readonly camera = camera;
   public readonly microphone = microphone;
   public readonly speaker = speaker;
+
+  // UI
+  public readonly ui = ui;
   
   // Constants
   public readonly DIMENSIONS = R1_DIMENSIONS;
