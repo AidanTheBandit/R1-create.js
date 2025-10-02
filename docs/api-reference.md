@@ -280,6 +280,28 @@ Convert text to speech.
 await r1.llm.textToSpeech('Hello world!');
 ```
 
+#### `textToSpeechAudio(text: string, options?: SpeechSynthesisOptions): Promise<Blob | null>`
+
+Generate audio file from text-to-speech using browser Web Speech API.
+
+```typescript
+const audioBlob = await r1.llm.textToSpeechAudio('Hello world', {
+  voice: speechSynthesis.getVoices()[0],
+  rate: 1.0,
+  pitch: 1.0,
+  volume: 0.8
+});
+
+if (audioBlob) {
+  // Save or play the audio file
+  const url = URL.createObjectURL(audioBlob);
+  const audio = new Audio(url);
+  audio.play();
+}
+```
+
+**Note:** Currently returns `null` due to Web Speech API limitations. Advanced audio capture techniques (AudioWorklet, WebRTC) would be required for actual audio file generation.
+
 #### `askLLMJSON(message: string, options?: LLMOptions): Promise<void>`
 
 Request JSON response from LLM.

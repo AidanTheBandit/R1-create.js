@@ -3,7 +3,7 @@
  * Provides structured messaging and LLM interaction capabilities
  */
 
-import type { PluginMessage, PluginMessageResponse } from '../types';
+import type { PluginMessage, PluginMessageResponse, SpeechSynthesisOptions } from '../types';
 
 export interface LLMOptions {
   wantsR1Response?: boolean;    // Whether LLM should speak through R1 speaker
@@ -188,6 +188,51 @@ export class R1Messaging {
 
     this.isInitialized = true;
   }
+
+  /**
+   * Generate audio file from text-to-speech (browser only)
+   * Uses Web Speech API to synthesize speech and capture as audio blob
+   * @param text Text to convert to audio
+   * @param options Speech synthesis options
+   * @returns Promise resolving to audio blob or null if not supported
+   */
+  async textToSpeechAudio(text: string, options: SpeechSynthesisOptions = {}): Promise<Blob | null> {
+    // Only works in browser environment
+    if (typeof window === 'undefined' || !window.speechSynthesis) {
+      throw new Error('Text-to-speech audio generation only available in browser with Web Speech API support');
+    }
+
+    return new Promise((resolve, reject) => {
+      try {
+        // Create speech utterance
+        const utterance = new SpeechSynthesisUtterance(text);
+
+        // Apply options
+        if (options.voice) utterance.voice = options.voice;
+        if (options.rate !== undefined) utterance.rate = options.rate;
+        if (options.pitch !== undefined) utterance.pitch = options.pitch;
+        if (options.volume !== undefined) utterance.volume = options.volume;
+
+        // Listen for speech end
+        utterance.onend = () => {
+          // Currently, we can't capture the audio output from speech synthesis
+          // This would require advanced techniques like AudioWorklet or WebRTC
+          // For now, we just speak and return null
+          resolve(null);
+        };
+
+        utterance.onerror = (error) => {
+          reject(new Error(`Speech synthesis failed: ${error.error}`));
+        };
+
+        // Speak the text
+        window.speechSynthesis.speak(utterance);
+
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
 }
 
 /**
@@ -247,6 +292,15 @@ export class LLMHelpers {
       `Given this UI context: "${context}", provide suggestions for user actions. ` +
       `Respond with JSON format: {"suggestions": [{"action": "action_name", "description": "description"}]}`
     );
+  }
+
+  /**
+   * Generate audio file from text-to-speech (browser only)
+   * @param text Text to convert to audio
+   * @param options Speech synthesis options
+   */
+  async textToSpeechAudio(text: string, options: SpeechSynthesisOptions = {}): Promise<Blob | null> {
+    return this.messaging.textToSpeechAudio(text, options);
   }
 }
 

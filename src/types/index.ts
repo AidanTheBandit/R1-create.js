@@ -91,4 +91,14 @@ declare global {
   };
 }
 
+/**
+ * Options for speech synthesis
+ */
+export interface SpeechSynthesisOptions {
+  voice?: SpeechSynthesisVoice;
+  rate?: number;    // 0.1 to 10
+  pitch?: number;   // 0 to 2
+  volume?: number;  // 0 to 1
+}
+
 export {};
