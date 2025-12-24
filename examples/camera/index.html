@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera Photo App</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #000;
+            color: #fff;
+            overflow: hidden;
+        }
+        
+        .container {
+            width: 240px;
+            height: 282px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        
+        h1 {
+            font-size: 18px;
+            margin: 10px 0;
+            text-align: center;
+        }
+        
+        #video, #photo {
+            width: 100%;
+            max-height: 150px;
+            object-fit: cover;
+            border-radius: 5px;
+            background: #111;
+        }
+        
+        #photo {
+            display: none;
+        }
+        
+        canvas {
+            display: none;
+        }
+        
+        button {
+            background: #FE5F00;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            margin: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        button:hover {
+            background: #e55500;
+        }
+        
+        button:active {
+            transform: scale(0.95);
+        }
+        
+        .status {
+            font-size: 11px;
+            margin-top: 10px;
+            text-align: center;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 5px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Camera App</h1>
+        
+        <video id="video" autoplay playsinline></video>
+        <img id="photo">
+        <canvas id="canvas"></canvas>
+        
+        <div class="button-group">
+            <button onclick="capturePhoto()">Take Photo</button>
+            <button onclick="switchCamera()">Switch</button>
+        </div>
+        
+        <div class="status" id="status">Initializing camera...</div>
+    </div>
+
+    <script type="module">
+        import { r1, createR1App } from './../../dist/index.js';
+        
+        let stream = null;
+        let currentFacingMode = 'user';
+        
+        createR1App(async (sdk) => {
+            await startCamera();
+            
+            // Hardware button to capture photo
+            sdk.hardware.on('sideClick', () => {
+                capturePhoto();
+            });
+        });
+        
+        async function startCamera() {
+            try {
+                stream = await r1.camera.start({ facingMode: currentFacingMode });
+                const video = document.getElementById('video');
+                video.srcObject = stream;
+                document.getElementById('status').textContent = 'Camera ready';
+                document.getElementById('photo').style.display = 'none';
+                document.getElementById('video').style.display = 'block';
+            } catch (error) {
+                document.getElementById('status').textContent = 'Camera error: ' + error.message;
+            }
+        }
+        
+        window.capturePhoto = async () => {
+            if (!stream) return;
+            
+            document.getElementById('status').textContent = 'Capturing...';
+            try {
+                const photoBlob = await r1.camera.capturePhoto(240, 282);
+                
+                // Display captured photo
+                const photo = document.getElementById('photo');
+                photo.src = URL.createObjectURL(photoBlob);
+                photo.style.display = 'block';
+                document.getElementById('video').style.display = 'none';
+                
+                document.getElementById('status').textContent = 'Photo captured!';
+            } catch (error) {
+                document.getElementById('status').textContent = 'Capture failed: ' + error.message;
+            }
+        };
+        
+        window.switchCamera = async () => {
+            if (!stream) return;
+            
+            document.getElementById('status').textContent = 'Switching camera...';
+            try {
+                await r1.camera.stop();
+                currentFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
+                await startCamera();
+                document.getElementById('status').textContent = 'Camera switched';
+            } catch (error) {
+                document.getElementById('status').textContent = 'Switch failed: ' + error.message;
+            }
+        };
+    </script>
+</body>
+</html>

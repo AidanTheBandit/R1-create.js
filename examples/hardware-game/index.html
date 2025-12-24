@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tilt Game</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #000;
+            color: #fff;
+            overflow: hidden;
+        }
+        
+        .container {
+            width: 240px;
+            height: 282px;
+            position: relative;
+            box-sizing: border-box;
+        }
+        
+        h1 {
+            font-size: 18px;
+            margin: 10px 0;
+            text-align: center;
+            position: absolute;
+            top: 10px;
+            width: 100%;
+        }
+        
+        .game-area {
+            width: 240px;
+            height: 282px;
+            position: relative;
+            background: linear-gradient(135deg, #1a1a1a 0%, #000 100%);
+        }
+        
+        .ball {
+            width: 20px;
+            height: 20px;
+            background: #FE5F00;
+            border-radius: 50%;
+            position: absolute;
+            left: 110px;
+            top: 131px;
+            box-shadow: 0 0 15px #FE5F00;
+            transition: left 0.05s ease-out, top 0.05s ease-out;
+        }
+        
+        .target {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #00ff00;
+            border-radius: 50%;
+            position: absolute;
+            left: 100px;
+            top: 121px;
+            opacity: 0.5;
+        }
+        
+        .score {
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            position: absolute;
+            top: 40px;
+            width: 100%;
+            color: #FE5F00;
+        }
+        
+        .instructions {
+            font-size: 10px;
+            text-align: center;
+            position: absolute;
+            bottom: 10px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="game-area">
+            <h1>Tilt Game</h1>
+            <div class="score" id="score">Score: 0</div>
+            <div class="target"></div>
+            <div class="ball" id="ball"></div>
+            <div class="instructions" id="instructions">Tilt device to move ball</div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { r1, createR1App } from './../../dist/index.js';
+        
+        let ballX = 120;
+        let ballY = 141;
+        let gameScore = 0;
+        let accelerometerStarted = false;
+        
+        createR1App(async (sdk) => {
+            const ball = document.getElementById('ball');
+            
+            // Check if accelerometer is available
+            if (await sdk.accelerometer.isAvailable()) {
+                // Start accelerometer
+                sdk.accelerometer.start((data) => {
+                    if (!accelerometerStarted) {
+                        accelerometerStarted = true;
+                        document.getElementById('instructions').textContent = 'Side button to reset';
+                    }
+                    
+                    // Update ball position based on tilt
+                    ballX += data.x * 5;
+                    ballY += data.y * 5;
+                    
+                    // Keep ball in bounds
+                    ballX = Math.max(10, Math.min(230, ballX));
+                    ballY = Math.max(10, Math.min(272, ballY));
+                    
+                    // Update ball position
+                    ball.style.left = `${ballX}px`;
+                    ball.style.top = `${ballY}px`;
+                    
+                    // Simple scoring (keep ball centered)
+                    const centerX = 120;
+                    const centerY = 141;
+                    const distance = Math.sqrt((ballX - centerX) ** 2 + (ballY - centerY) ** 2);
+                    
+                    if (distance < 20) {
+                        gameScore += 1;
+                        document.getElementById('score').textContent = `Score: ${gameScore}`;
+                        
+                        if (gameScore % 100 === 0) {
+                            sdk.messaging.speakText('Nice!');
+                        }
+                    }
+                });
+            } else {
+                document.getElementById('instructions').textContent = 'Accelerometer not available';
+            }
+            
+            // Hardware button to reset
+            sdk.hardware.on('sideClick', () => {
+                ballX = 120;
+                ballY = 141;
+                gameScore = 0;
+                document.getElementById('score').textContent = 'Score: 0';
+                ball.style.left = `${ballX}px`;
+                ball.style.top = `${ballY}px`;
+                sdk.messaging.speakText('Game reset!');
+            });
+            
+            // Scroll wheel to adjust sensitivity (optional)
+            let sensitivity = 5;
+            sdk.hardware.on('scrollUp', () => {
+                sensitivity = Math.min(10, sensitivity + 1);
+            });
+            sdk.hardware.on('scrollDown', () => {
+                sensitivity = Math.max(1, sensitivity - 1);
+            });
+        });
+    </script>
+</body>
+</html>
