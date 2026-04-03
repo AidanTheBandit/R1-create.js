@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Recorder</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #000;
+            color: #fff;
+            overflow: hidden;
+        }
+        
+        .container {
+            width: 240px;
+            height: 282px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        h1 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        button {
+            background: #FE5F00;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            min-width: 150px;
+        }
+        
+        button:hover {
+            background: #e55500;
+        }
+        
+        button:active {
+            transform: scale(0.95);
+        }
+        
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+        
+        button.recording {
+            background: #ff0000;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .status {
+            font-size: 12px;
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Voice Recorder</h1>
+        
+        <button id="recordBtn" onclick="toggleRecording()">Start Recording</button>
+        <button id="playBtn" onclick="playRecording()" disabled>Play Recording</button>
+        
+        <div class="status" id="status">Ready</div>
+    </div>
+
+    <script type="module">
+        import { r1, createR1App } from './../../dist/index.js';
+        
+        let isRecording = false;
+        let recordedAudio = null;
+        
+        createR1App(async (sdk) => {
+            document.getElementById('status').textContent = 'Ready';
+            
+            // Hardware button to toggle recording
+            sdk.hardware.on('sideClick', () => {
+                toggleRecording();
+            });
+        });
+        
+        window.toggleRecording = async () => {
+            const recordBtn = document.getElementById('recordBtn');
+            const playBtn = document.getElementById('playBtn');
+            const status = document.getElementById('status');
+            
+            if (isRecording) {
+                // Stop recording
+                status.textContent = 'Processing...';
+                try {
+                    recordedAudio = await r1.microphone.stopRecording();
+                    recordBtn.textContent = 'Start Recording';
+                    recordBtn.classList.remove('recording');
+                    playBtn.disabled = false;
+                    status.textContent = 'Recording saved';
+                    isRecording = false;
+                } catch (error) {
+                    status.textContent = 'Recording failed: ' + error.message;
+                }
+            } else {
+                // Start recording
+                status.textContent = 'Recording...';
+                try {
+                    await r1.microphone.startRecording();
+                    recordBtn.textContent = 'Stop Recording';
+                    recordBtn.classList.add('recording');
+                    playBtn.disabled = true;
+                    isRecording = true;
+                } catch (error) {
+                    status.textContent = 'Recording failed: ' + error.message;
+                }
+            }
+        };
+        
+        window.playRecording = async () => {
+            if (!recordedAudio) return;
+            
+            const status = document.getElementById('status');
+            status.textContent = 'Playing...';
+            try {
+                await r1.speaker.play(recordedAudio);
+                status.textContent = 'Playback complete';
+            } catch (error) {
+                status.textContent = 'Playback failed: ' + error.message;
+            }
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text-to-Speech App</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #000;
+            color: #fff;
+            overflow: hidden;
+        }
+        
+        .container {
+            width: 240px;
+            height: 282px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        h1 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        input {
+            width: 80%;
+            padding: 10px;
+            font-size: 14px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #333;
+            background: #111;
+            color: #fff;
+            box-sizing: border-box;
+        }
+        
+        button {
+            background: #FE5F00;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        button:hover {
+            background: #e55500;
+        }
+        
+        button:active {
+            transform: scale(0.95);
+        }
+        
+        .status {
+            font-size: 12px;
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Text-to-Speech</h1>
+        
+        <input type="text" id="textInput" placeholder="Enter text to speak...">
+        
+        <button onclick="speak()">Speak</button>
+        <button onclick="askAI()">Ask AI</button>
+        
+        <div class="status" id="status">Ready</div>
+    </div>
+
+    <script type="module">
+        import { r1, createR1App } from './../../dist/index.js';
+        
+        createR1App(async (sdk) => {
+            document.getElementById('status').textContent = 'Ready';
+            
+            // Hardware button to trigger speak
+            sdk.hardware.on('sideClick', () => {
+                speak();
+            });
+        });
+        
+        window.speak = async () => {
+            const text = document.getElementById('textInput').value.trim();
+            if (text) {
+                document.getElementById('status').textContent = 'Speaking...';
+                try {
+                    await r1.messaging.speakText(text);
+                    document.getElementById('status').textContent = 'Ready';
+                } catch (error) {
+                    document.getElementById('status').textContent = 'Error: ' + error.message;
+                }
+            } else {
+                document.getElementById('status').textContent = 'Please enter text';
+            }
+        };
+        
+        window.askAI = async () => {
+            const text = document.getElementById('textInput').value.trim();
+            if (text) {
+                document.getElementById('status').textContent = 'Asking AI...';
+                try {
+                    await r1.llm.askLLMSpeak(text);
+                    document.getElementById('status').textContent = 'Ready';
+                } catch (error) {
+                    document.getElementById('status').textContent = 'Error: ' + error.message;
+                }
+            } else {
+                document.getElementById('status').textContent = 'Please enter text';
+            }
+        };
+    </script>
+</body>
+</html>

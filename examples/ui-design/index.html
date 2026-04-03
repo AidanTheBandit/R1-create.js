@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UI Design Demo</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #000;
+            color: #fff;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            width: 240px;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+        
+        h1 {
+            font-size: 20px;
+            margin: 10px 0 20px 0;
+            text-align: center;
+        }
+        
+        .section {
+            margin: 20px 0;
+        }
+        
+        .section-title {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #FE5F00;
+        }
+        
+        .button-wide {
+            background: #FE5F00;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            width: 100%;
+            margin: 5px 0;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .button-standard {
+            background: #FE5F00;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .button-small {
+            background: #FE5F00;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 11px;
+            margin: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        button:hover {
+            background: #e55500;
+        }
+        
+        button:active {
+            transform: scale(0.95);
+        }
+        
+        .text-large {
+            font-size: 18px;
+            color: #FE5F00;
+            margin: 10px 0;
+        }
+        
+        .text-body {
+            font-size: 14px;
+            margin: 10px 0;
+            line-height: 1.4;
+        }
+        
+        .text-small {
+            font-size: 11px;
+            color: #888;
+            margin: 10px 0;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        
+        .grid-item {
+            padding: 15px;
+            background: #111;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 12px;
+        }
+        
+        .color-box {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border-radius: 5px;
+            margin: 5px;
+            border: 1px solid #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>UI Design Demo</h1>
+        
+        <div class="section">
+            <div class="section-title">Buttons</div>
+            <button class="button-wide" onclick="speak('Wide button pressed')">Wide Button</button>
+            <div style="text-align: center;">
+                <button class="button-standard" onclick="speak('Standard button pressed')">Standard</button>
+                <button class="button-small" onclick="speak('Small button pressed')">Small</button>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Typography</div>
+            <div class="text-large">Large Heading</div>
+            <div class="text-body">This is body text with normal size. It's readable and comfortable for longer content.</div>
+            <div class="text-small">This is smaller text for secondary information.</div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Grid Layout</div>
+            <div class="grid">
+                <div class="grid-item">Grid 1</div>
+                <div class="grid-item">Grid 2</div>
+                <div class="grid-item">Grid 3</div>
+                <div class="grid-item">Grid 4</div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">Color Palette</div>
+            <div style="text-align: center;">
+                <div class="color-box" style="background: #FE5F00;" title="Primary"></div>
+                <div class="color-box" style="background: #000;" title="Background"></div>
+                <div class="color-box" style="background: #111;" title="Surface"></div>
+                <div class="color-box" style="background: #fff;" title="Text"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { r1, createR1App } from './../../dist/index.js';
+        
+        createR1App(async (sdk) => {
+            // Hardware interactions
+            sdk.hardware.on('sideClick', () => {
+                speak('Side button demo!');
+            });
+        });
+        
+        window.speak = async (text) => {
+            try {
+                await r1.messaging.speakText(text);
+            } catch (error) {
+                console.error('Speech error:', error);
+            }
+        };
+    </script>
+</body>
+</html>

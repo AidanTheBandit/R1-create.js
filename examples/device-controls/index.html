@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Controls Example</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #000;
+            color: #fff;
+            overflow: hidden;
+        }
+        
+        .container {
+            width: 240px;
+            height: 282px;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        
+        h1 {
+            font-size: 18px;
+            margin: 10px 0 20px 0;
+            text-align: center;
+        }
+        
+        .status {
+            font-size: 13px;
+            margin-bottom: 20px;
+            text-align: center;
+            padding: 10px;
+            background: #111;
+            border-radius: 5px;
+        }
+        
+        .controls {
+            font-size: 11px;
+            line-height: 1.8;
+            background: #111;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 3px solid #FE5F00;
+        }
+        
+        .control-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+        }
+        
+        .control-label {
+            color: #888;
+        }
+        
+        .control-value {
+            color: #FE5F00;
+            font-weight: bold;
+        }
+        
+        .enabled {
+            color: #00ff00;
+        }
+        
+        .disabled {
+            color: #ff0000;
+        }
+        
+        .instructions {
+            font-size: 10px;
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Device Controls</h1>
+        
+        <div class="status" id="status">Initializing device controls...</div>
+        
+        <div class="controls" id="controls">
+            <div class="control-item">
+                <span class="control-label">Side Button:</span>
+                <span class="control-value disabled" id="sideButtonStatus">Disabled</span>
+            </div>
+            <div class="control-item">
+                <span class="control-label">Scroll Wheel:</span>
+                <span class="control-value disabled" id="scrollWheelStatus">Disabled</span>
+            </div>
+            <div class="control-item">
+                <span class="control-label">Side Button Presses:</span>
+                <span class="control-value" id="sideButtonCount">0</span>
+            </div>
+            <div class="control-item">
+                <span class="control-label">Scroll Up:</span>
+                <span class="control-value" id="scrollUpCount">0</span>
+            </div>
+            <div class="control-item">
+                <span class="control-label">Scroll Down:</span>
+                <span class="control-value" id="scrollDownCount">0</span>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            Press side button or scroll wheel<br>
+            Keyboard: Space = side button
+        </div>
+    </div>
+
+    <script type="module">
+        import { r1, deviceControls, createR1App } from './../../dist/index.js';
+        
+        let sideButtonPresses = 0;
+        let scrollUpEvents = 0;
+        let scrollDownEvents = 0;
+        
+        createR1App(async (sdk) => {
+            // Initialize device controls
+            deviceControls.init({
+                sideButtonEnabled: true,
+                scrollWheelEnabled: true,
+                keyboardFallback: true
+            });
+            
+            document.getElementById('status').textContent = 'Device controls ready!';
+            updateDisplay();
+            
+            // Register event handlers
+            deviceControls.on('sideButton', (event) => {
+                sideButtonPresses++;
+                sdk.messaging.speakText('Side button pressed!');
+                updateDisplay();
+            });
+            
+            deviceControls.on('scrollWheel', (data) => {
+                if (data.direction === 'up') {
+                    scrollUpEvents++;
+                } else if (data.direction === 'down') {
+                    scrollDownEvents++;
+                }
+                updateDisplay();
+            });
+            
+            // Demo: Toggle controls after 5 seconds
+            setTimeout(() => {
+                deviceControls.setSideButtonEnabled(false);
+                updateDisplay();
+                sdk.messaging.speakText('Side button disabled');
+            }, 5000);
+            
+            // Re-enable after 10 seconds
+            setTimeout(() => {
+                deviceControls.setSideButtonEnabled(true);
+                updateDisplay();
+                sdk.messaging.speakText('Side button enabled');
+            }, 10000);
+        });
+        
+        function updateDisplay() {
+            const sideButtonStatus = document.getElementById('sideButtonStatus');
+            const scrollWheelStatus = document.getElementById('scrollWheelStatus');
+            
+            if (deviceControls.isSideButtonEnabled()) {
+                sideButtonStatus.textContent = 'Enabled';
+                sideButtonStatus.className = 'control-value enabled';
+            } else {
+                sideButtonStatus.textContent = 'Disabled';
+                sideButtonStatus.className = 'control-value disabled';
+            }
+            
+            if (deviceControls.isScrollWheelEnabled()) {
+                scrollWheelStatus.textContent = 'Enabled';
+                scrollWheelStatus.className = 'control-value enabled';
+            } else {
+                scrollWheelStatus.textContent = 'Disabled';
+                scrollWheelStatus.className = 'control-value disabled';
+            }
+            
+            document.getElementById('sideButtonCount').textContent = sideButtonPresses;
+            document.getElementById('scrollUpCount').textContent = scrollUpEvents;
+            document.getElementById('scrollDownCount').textContent = scrollDownEvents;
+        }
+    </script>
+</body>
+</html>

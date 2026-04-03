@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Search</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #000;
+            color: #fff;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            width: 240px;
+            min-height: 282px;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+        
+        h1 {
+            font-size: 18px;
+            margin: 10px 0;
+            text-align: center;
+        }
+        
+        input {
+            width: 100%;
+            padding: 10px;
+            font-size: 13px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #333;
+            background: #111;
+            color: #fff;
+            box-sizing: border-box;
+        }
+        
+        button {
+            background: #FE5F00;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            width: 100%;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        button:hover {
+            background: #e55500;
+        }
+        
+        button:active {
+            transform: scale(0.98);
+        }
+        
+        .results {
+            margin-top: 20px;
+            font-size: 11px;
+        }
+        
+        .result-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: #111;
+            border-radius: 5px;
+            border-left: 3px solid #FE5F00;
+        }
+        
+        .result-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .result-url {
+            font-size: 10px;
+            color: #888;
+            margin-bottom: 5px;
+        }
+        
+        .result-snippet {
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Web Search</h1>
+        
+        <input type="text" id="searchInput" placeholder="Search the web...">
+        <button onclick="search()">Search</button>
+        
+        <div class="results" id="results"></div>
+    </div>
+
+    <script type="module">
+        import { r1, createR1App } from './../../dist/index.js';
+        
+        createR1App(async (sdk) => {
+            // Message handler for search results
+            sdk.messaging.onMessage((response) => {
+                const resultsDiv = document.getElementById('results');
+                
+                if (response.parsedData && response.parsedData.results) {
+                    const searchResults = response.parsedData.results;
+                    resultsDiv.innerHTML = searchResults.map(result => `
+                        <div class="result-item">
+                            <div class="result-title">${result.title}</div>
+                            <div class="result-url">${result.url}</div>
+                            <div class="result-snippet">${result.snippet}</div>
+                        </div>
+                    `).join('');
+                } else if (response.message) {
+                    resultsDiv.innerHTML = `<div style="text-align: center; padding: 20px;">${response.message}</div>`;
+                }
+            });
+            
+            // Hardware button to trigger search
+            sdk.hardware.on('sideClick', () => {
+                search();
+            });
+        });
+        
+        window.search = async () => {
+            const query = document.getElementById('searchInput').value.trim();
+            const resultsDiv = document.getElementById('results');
+            
+            if (query) {
+                resultsDiv.innerHTML = '<div style="text-align: center; padding: 20px;">Searching...</div>';
+                try {
+                    await r1.messaging.searchWeb(query);
+                } catch (error) {
+                    resultsDiv.innerHTML = `<div style="text-align: center; padding: 20px; color: #ff0000;">Search failed: ${error.message}</div>`;
+                }
+            } else {
+                resultsDiv.innerHTML = '<div style="text-align: center; padding: 20px;">Please enter a search query</div>';
+            }
+        };
+    </script>
+</body>
+</html>
