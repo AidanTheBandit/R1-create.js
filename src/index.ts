@@ -47,6 +47,14 @@ export {
   messaging,
   llmHelpers
 } from './llm';
+export type {
+  PushToTalkOptions,
+  SearchWebOptions,
+  SerpSearchTag,
+  WaitForMessageOptions,
+  EmailOptions,
+  ImageMessageOptions
+} from './llm';
 
 // UI utilities
 export {

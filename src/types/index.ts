@@ -47,6 +47,8 @@ export interface PluginMessageResponse {
   message: string;
   pluginId: string;
   data?: string; // JSON string with response data
+  type?: string; // Optional event type (e.g., sttEnded)
+  transcript?: string; // Optional transcript payload from STT
 }
 
 // UI types
@@ -79,6 +81,10 @@ declare global {
 
   // Global message handlers
   const PluginMessageHandler: {
+    postMessage(message: string): void;
+  };
+
+  const CreationVoiceHandler: {
     postMessage(message: string): void;
   };
   

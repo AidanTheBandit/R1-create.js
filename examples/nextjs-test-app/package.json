@@ -1,0 +1,18 @@
+{
+  "name": "r1-create-nextjs-test-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "relay": "node log-relay/server.js"
+  },
+  "dependencies": {
+    "next": "16.2.2",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1"
+  }
+}

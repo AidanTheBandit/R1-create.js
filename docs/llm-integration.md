@@ -184,6 +184,19 @@ r1.messaging.onMessage((response) => {
 await r1.messaging.searchWeb('latest news');
 ```
 
+### Advanced Search Options
+
+```typescript
+await r1.messaging.searchWeb('weather in Tokyo', {
+  tag: 'weather',
+  useLocation: true
+});
+
+await r1.messaging.searchWeb('remote javascript jobs', {
+  tag: 'jobs'
+});
+```
+
 ## Structured Responses
 
 ### JSON Responses
@@ -265,6 +278,51 @@ r1.messaging.offMessage(handler1);
 r1.messaging.removeAllHandlers();
 ```
 
+### Request/Response with Timeout
+
+```typescript
+const response = await r1.messaging.askLLMWithTimeout(
+  'Summarize this in one sentence',
+  { wantsR1Response: false },
+  { timeoutMs: 15000 }
+);
+
+console.log(response.message);
+```
+
+You can also wait for any incoming message directly:
+
+```typescript
+const next = await r1.messaging.waitForNextMessage({ timeoutMs: 10000 });
+```
+
+### Runtime Capability Checks
+
+```typescript
+const caps = r1.messaging.getRuntimeCapabilities();
+if (!caps.pluginMessageHandler) {
+  console.warn('R1 messaging bridge is not available in this environment');
+}
+```
+
+### Programmatic STT + Push-to-Talk
+
+```typescript
+// Start/stop STT directly
+r1.messaging.startSTTListening();
+r1.messaging.stopSTTListening();
+
+// Hardware long-press integration
+const disablePTT = r1.messaging.enablePushToTalk({
+  processMessage: 'process_voice_input',
+  onTranscript: (transcript) => {
+    console.log('User said:', transcript);
+  }
+});
+
+// disablePTT();
+```
+
 ### Error Handling
 
 ```typescript
@@ -299,6 +357,15 @@ await r1.messaging.sendMessage('Describe this image', {
   imageBase64: imageBase64,
   pluginId: 'image-analyzer'
 });
+
+// Convenience helper
+await r1.llm.analyzeImageBase64('Describe this image', imageBase64);
+```
+
+### Email Content to User
+
+```typescript
+await r1.messaging.emailUser('Please email this summary to the user.');
 ```
 
 ### Multi-turn Conversations

@@ -39,6 +39,25 @@ Chat interface demonstrating:
 - Voice input/output
 - UI optimization for R1 display
 
+### 6. Messaging Test Harness (`messaging-test/`)
+Comprehensive API test surface for messaging features:
+- Runtime capability checks
+- Timeout-based message waiting
+- `askLLMWithTimeout` request flow
+- Advanced SERP search tags/options
+- `emailUser` helper
+- `analyzeImageBase64` helper
+- Programmatic STT controls and push-to-talk wiring
+
+### 7. Next.js Full SDK Test App (`nextjs-test-app/`)
+Comprehensive test app that exercises nearly all SDK surfaces:
+- Core initialization and feature detection
+- Hardware APIs (accelerometer, touch, events, device controls)
+- Storage APIs and Base64 helpers
+- Messaging/LLM APIs including STT and push-to-talk
+- UI utilities, transitions, and component lifecycle
+- Media APIs and utilities with manual permission-based tests
+
 ## Running Examples
 
 1. Build the SDK first:
@@ -52,6 +71,23 @@ Chat interface demonstrating:
    ```
 
 3. Navigate to `http://localhost:8080/[example-name]/` in your browser
+
+### Running the Next.js test app
+
+```bash
+cd examples/nextjs-test-app
+npm install
+npm run dev
+```
+
+Then open `http://localhost:3000`.
+
+Optional log relay (pipe device console logs into dashboard):
+
+```bash
+cd examples/nextjs-test-app
+npm run relay
+```
 
 ## Note for R1 Device
 

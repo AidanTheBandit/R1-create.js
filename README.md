@@ -109,6 +109,53 @@ r1.messaging.onMessage((response) => {
     console.log('Parsed response:', response.parsedData);
   }
 });
+
+// Push-to-talk using hardware long press + STT transcript forwarding
+const disablePTT = r1.messaging.enablePushToTalk({
+  onTranscript: (transcript) => {
+    console.log('User said:', transcript);
+  }
+});
+
+// Programmatic STT control
+r1.messaging.startSTTListening();
+// ...later
+r1.messaging.stopSTTListening();
+
+// Later, if needed:
+// disablePTT();
+
+// Wait for a matching response with timeout
+const llmResponse = await r1.messaging.askLLMWithTimeout(
+  'Summarize this in one sentence',
+  { wantsR1Response: false },
+  { timeoutMs: 15000 }
+);
+console.log('LLM response:', llmResponse.message);
+
+// Advanced SERP search options
+await r1.messaging.searchWeb('weather in Tokyo', {
+  tag: 'weather',
+  useLocation: true
+});
+
+// Ask R1 to email content to the user
+await r1.messaging.emailUser('Your itinerary for today...');
+
+// Analyze an image with LLM
+await r1.llm.analyzeImageBase64('Describe this image', myBase64Image);
+
+// Ask about an image (image + prompt)
+await r1.llm.askImage(myBase64Image, 'What do you see in this image?');
+
+// Transform an image (sends: "take a photo and make it <prompt>")
+await r1.llm.transformPhoto(myBase64Image, 'a watercolor painting');
+
+// Send image with no prompt
+await r1.llm.imageToAI(myBase64Image, '');
+
+// Runtime bridge checks (useful during development)
+console.log(r1.messaging.getRuntimeCapabilities());
 ```
 
 ### Media APIs

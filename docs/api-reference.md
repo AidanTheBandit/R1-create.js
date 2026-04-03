@@ -245,6 +245,104 @@ Search the web using SERP API.
 
 ```typescript
 await r1.messaging.searchWeb('current weather in Tokyo');
+
+// Advanced options
+await r1.messaging.searchWeb('hotels in Berlin', {
+  tag: 'hotels',
+  useLocation: true
+});
+```
+
+#### `waitForNextMessage(options?: WaitForMessageOptions): Promise<PluginMessageResponse>`
+
+Wait for the next incoming plugin message with optional timeout/predicate filtering.
+
+```typescript
+const response = await r1.messaging.waitForNextMessage({
+  timeoutMs: 15000,
+  predicate: (msg) => msg.type !== 'heartbeat'
+});
+console.log(response.message);
+```
+
+#### `askLLMWithTimeout(message: string, options?: LLMOptions, waitOptions?: WaitForMessageOptions): Promise<PluginMessageResponse>`
+
+Send an LLM prompt and wait for a response in a single call.
+
+```typescript
+const response = await r1.messaging.askLLMWithTimeout(
+  'Summarize this text',
+  { wantsR1Response: false },
+  { timeoutMs: 20000 }
+);
+```
+
+#### `emailUser(content: string, options?: EmailOptions): Promise<void>`
+
+Ask R1 to email content to the user.
+
+```typescript
+await r1.messaging.emailUser('Please send this summary to me.');
+```
+
+#### `sendImageToAI(imageBase64: string, prompt?: string, options?: ImageMessageOptions): Promise<void>`
+
+Send image data to AI with optional prompt.
+
+```typescript
+await r1.messaging.sendImageToAI(imageBase64, 'What is in this photo?');
+await r1.messaging.sendImageToAI(imageBase64, ''); // no-prompt image flow
+```
+
+#### `askAboutImage(imageBase64: string, prompt: string, options?: ImageMessageOptions): Promise<void>`
+
+Ask AI about an image (image + prompt).
+
+```typescript
+await r1.messaging.askAboutImage(imageBase64, 'Describe this image.');
+```
+
+#### `transformImage(imageBase64: string, transformPrompt: string, options?: ImageMessageOptions): Promise<void>`
+
+Transform image with prompt format: `take a photo and make it <prompt>`.
+
+```typescript
+await r1.messaging.transformImage(imageBase64, 'a watercolor painting');
+```
+
+#### `getRuntimeCapabilities(): { pluginMessageHandler: boolean; creationVoiceHandler: boolean; closeWebView: boolean }`
+
+Check runtime bridge availability for messaging and voice integrations.
+
+```typescript
+const caps = r1.messaging.getRuntimeCapabilities();
+console.log(caps.pluginMessageHandler);
+```
+
+#### `startSTTListening(): void`
+
+Programmatically start STT listening via `CreationVoiceHandler`.
+
+```typescript
+r1.messaging.startSTTListening();
+```
+
+#### `stopSTTListening(): void`
+
+Programmatically stop STT listening via `CreationVoiceHandler`.
+
+```typescript
+r1.messaging.stopSTTListening();
+```
+
+#### `enablePushToTalk(options?: PushToTalkOptions): () => void`
+
+Enable push-to-talk wiring for long press events plus transcript forwarding.
+
+```typescript
+const disable = r1.messaging.enablePushToTalk({
+  onTranscript: (text) => console.log(text)
+});
 ```
 
 #### `onMessage(callback: MessageHandler): void`
@@ -324,6 +422,39 @@ Analyze data with LLM.
 
 ```typescript
 await r1.llm.analyzeData('Analyze this data', myData);
+```
+
+#### `analyzeImageBase64(prompt: string, imageBase64: string, options?: MessageOptions): Promise<void>`
+
+Analyze a base64 image using LLM vision support.
+
+```typescript
+await r1.llm.analyzeImageBase64('Describe this image', imageBase64);
+```
+
+#### `imageToAI(imageBase64: string, prompt?: string, options?: ImageMessageOptions): Promise<void>`
+
+Send image to AI with optional prompt.
+
+```typescript
+await r1.llm.imageToAI(imageBase64, 'What is this?');
+await r1.llm.imageToAI(imageBase64, '');
+```
+
+#### `askImage(imageBase64: string, prompt: string, options?: ImageMessageOptions): Promise<void>`
+
+Ask about image via helper wrapper.
+
+```typescript
+await r1.llm.askImage(imageBase64, 'Describe the scene in detail.');
+```
+
+#### `transformPhoto(imageBase64: string, prompt: string, options?: ImageMessageOptions): Promise<void>`
+
+Transform image with helper wrapper using phrase `take a photo and make it ...`.
+
+```typescript
+await r1.llm.transformPhoto(imageBase64, 'cyberpunk neon style');
 ```
 
 ## Storage APIs
